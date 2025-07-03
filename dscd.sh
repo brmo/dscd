@@ -4,10 +4,10 @@
 # Default configuration values
 ########################################
 BASE_DIR=""                    # Initialize empty variable
-LOG_FILE="/tmp/dccd.log"       # Default log file name
+LOG_FILE="/tmp/dscd.log"       # Default log file name
 PRUNE=0                        # Default prune setting
 GRACEFUL=0                     # Default graceful setting
-TMPRESTART="/tmp/dccd.restart" # Default log file for graceful setting
+TMPRESTART="/tmp/dscd.restart" # Default log file for graceful setting
 REMOTE_BRANCH="main"           # Default remote branch name
 COMPOSE_OPTS=""                # Additional options for docker compose
 
@@ -71,9 +71,9 @@ update_compose_files() {
             run_compose_command() {
                 local cmd_args="$1"
                 if [ -n "$COMPOSE_OPTS" ]; then
-                    eval "docker compose $COMPOSE_OPTS $cmd_args"
+                    eval "docker stack deploy $COMPOSE_OPTS $cmd_args"
                 else
-                    eval "docker compose $cmd_args"
+                    eval "docker stack deploy $cmd_args"
                 fi
             }
 
