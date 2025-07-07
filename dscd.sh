@@ -72,9 +72,9 @@ update_compose_files() {
             run_compose_command() {
                 local cmd_args="$1"
                 if [ -n "$COMPOSE_OPTS" ]; then
-                    eval "docker stack deploy $COMPOSE_OPTS $cmd_args"
+                    eval "docker stack deploy -d $COMPOSE_OPTS $cmd_args"
                 else
-                    eval "docker stack deploy $cmd_args"
+                    eval "docker stack deploy -d $cmd_args"
                    log_message "DEBUG: docker stack deploy \"$cmd_args\""
                 fi
             }
