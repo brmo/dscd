@@ -66,6 +66,7 @@ update_compose_files() {
 
         redeploy_compose_file() {
             local file=$1
+            local stackname=$2
 
             # Build the command based on whether we have extra options
             run_compose_command() {
@@ -74,6 +75,7 @@ update_compose_files() {
                     eval "docker stack deploy $COMPOSE_OPTS $cmd_args"
                 else
                     eval "docker stack deploy $cmd_args"
+                   log_message "DEBUG: docker stack deploy \"$cmd_args\""
                 fi
             }
 
@@ -87,22 +89,29 @@ update_compose_files() {
                 fi
             else
                 log_message "STATE: Redeploying compose file for $file"
-                run_compose_command "-f \"$file\""
+                run_compose_command "-c $file $stackname"
+                log_message "DEBUG: run_compose_command -c $file $stackname"
             fi
         }
 
         find . -type f \( -name 'docker-compose.yml' -o -name 'docker-compose.yaml' -o -name 'compose.yaml' -o -name 'compose.yml' \) | sort | while IFS= read -r file; do
             # Extract the directory containing the file
             dir=$(dirname "$file")
+            stackname=${dir##*/}
+
+           log_message "STATE: Redeploying stack $stackname"
 
             # If EXCLUDE is set
             if [ -n "$EXCLUDE" ]; then
                 # If the directory does not contain the exclude pattern
                 if [[ "$dir" != *"$EXCLUDE"* ]]; then
-                    redeploy_compose_file "$file"
+                    redeploy_compose_file "$file" "$stackname"
+                    log_message  "DEBUG: redeploy_compose_file \"$file\" \"$stackname\""
                 fi
-            else
-                redeploy_compose_file "$file"
+
+           else
+                redeploy_compose_file "$file" "$stackname"
+
             fi
         done
     else
@@ -136,7 +145,7 @@ usage() {
       -o <options>    Additional options to pass directly to \`docker compose...\` (optional)
       -p              Specify if you want to prune docker images (default: don't prune)
       -x <path>       Exclude directories matching the specified pattern (optional - relative to the base directory)
-      
+
     Example: /path/to/dccd.sh -b master -d /path/to/git_repo -g -l /tmp/dccd.txt -o \"--env-file /path/to/my.env\" -p -x ignore_this_directory
 
 "
