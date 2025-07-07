@@ -81,13 +81,13 @@ update_compose_files() {
                 run_compose_command "-f \"$file\" up -d --dry-run" &> $TMPRESTART
                 if grep -q "Recreate" $TMPRESTART; then
                     log_message "GRACEFUL: Redeploying compose file for $file"
-                    run_compose_command "-f \"$file\" up -d --quiet-pull"
+                    run_compose_command "-f \"$file\""
                 else
                     log_message "GRACEFUL: Skipping Redeploying compose file for $file (no change)"
                 fi
             else
                 log_message "STATE: Redeploying compose file for $file"
-                run_compose_command "-f \"$file\" up -d --quiet-pull"
+                run_compose_command "-f \"$file\""
             fi
         }
 
